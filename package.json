@@ -1,0 +1,8 @@
+{
+  "name": "watch-together",
+  "version": "0.0.1",
+  "description": "Syncing video across the web",
+  "dependencies": {
+    "express": "^4.10.2"
+  }
+}
