@@ -16,6 +16,7 @@
 </head>
 <body>
 	<ul id="messages"></ul>
+  <div id="player"></div>
   <form action="">
     <input id="m" autocomplete="off" /><button>Send</button>
   </form>  
@@ -23,6 +24,42 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
+    // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var player; 
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '390', 
+        width: '640', 
+        videoId: 'M7lc1UVf-VE', 
+        events: {
+          // 'onReady' : onPlayerReady, 
+          'onStateChange' : onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      event.target.playVideo();
+    }
+
+    var done = false; 
+    function onPlayerStateChange(event){
+      if( event.data == YT.PlayerState.PLAYING && !done) {
+        setTimout(stopVideo, 6000); 
+        done = true; 
+      }
+    }
+    function stopVideo(){
+      player.stopVideo();
+    }
+  </script>
+    <script>
     var socket = io(); 
     var username = "default"; 
       $('form').submit(function(){
@@ -32,6 +69,18 @@
       });
     socket.on('chat message', function(msg){
       $('#messages').append($('<li>').text(msg));
+    });
+    socket.on('videoCmd', function(msg){
+      $('#messages').append($('<li>').text("cmd - " + msg));
+      if(msg === "playVideo"){
+        player.playVideo();
+      } 
+      if(msg === "pauseVideo"){
+        player.pauseVideo();
+      }
+      if(msg === "stopVideo"){
+        player.stopVideo();
+      }
     });
   </script>
 </body>
